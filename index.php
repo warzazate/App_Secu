@@ -19,7 +19,8 @@
             <th>Actions</th>
         </tr>
         <?php
-        $stmt = $pdo->query('SELECT * FROM students');
+        // il fallait mettre $con et pas $pdo pour lancer une requête à la base de données !!!!!
+        $stmt = $con->query('SELECT * FROM students');
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<tr>";
             echo "<td>" . htmlspecialchars($row['id']) . "</td>";
