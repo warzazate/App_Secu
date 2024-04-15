@@ -1,17 +1,30 @@
 <?php
-include 'db.php';
+include 'db.php'; // Assure-toi que ce fichier inclut la connexion à ta base de données
 
+// Traitement du formulaire après soumission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupérer les données du formulaire
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
     $age = $_POST['age'];
 
-    $stmt = $pdo->prepare("INSERT INTO students (first_name, last_name, email, age) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$first_name, $last_name, $email, $age]);
+    // Préparer la requête SQL pour insérer les données
+    $insertStmt = $con->prepare("INSERT INTO students (first_name, last_name, email, age) VALUES (?, ?, ?, ?)");
+    $insertStmt->bindValue(1, $first_name);
+    $insertStmt->bindValue(2, $last_name);
+    $insertStmt->bindValue(3, $email);
+    $insertStmt->bindValue(4, $age);
 
-    header("Location: index.php");
-    exit;
+    // Exécuter la requête
+    try {
+        $insertStmt->execute();
+        // Redirection vers la page principale après l'insertion
+        header("Location: index.php");
+        exit;
+    } catch (PDOException $e) {
+        die("Erreur lors de l'ajout de l'étudiant : " . $e->getMessage());
+    }
 }
 ?>
 <!DOCTYPE html>

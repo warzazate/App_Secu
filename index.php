@@ -9,6 +9,7 @@
 <body>
     <h1>List of Students</h1>
     <a href="create.php">Add New Student</a>
+    <a href="login.php">Login Here</a>
     <table border="1">
         <tr>
             <th>ID</th>

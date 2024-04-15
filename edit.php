@@ -4,7 +4,7 @@ include 'db.php';
 // Vérification de l'ID de l'étudiant et récupération des données
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
+    $stmt = $con->prepare("SELECT * FROM students WHERE id = ?");
     $stmt->execute([$id]);
     $student = $stmt->fetch();
     
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $age = $_POST['age'];
 
     // Mise à jour des données de l'étudiant dans la base de données
-    $updateStmt = $pdo->prepare("UPDATE students SET first_name = ?, last_name = ?, email = ?, age = ? WHERE id = ?");
+    $updateStmt = $con->prepare("UPDATE students SET first_name = ?, last_name = ?, email = ?, age = ? WHERE id = ?");
     $updateStmt->execute([$first_name, $last_name, $email, $age, $id]);
 
     // Redirection vers la page principale après mise à jour
