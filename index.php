@@ -9,6 +9,7 @@
 <body>
     <h1>List of Students</h1>
     <a href="create.php">Add New Student</a>
+    <a href="upload_certificate.php">Upload un nouveau certificat de scolarité</a>
     <table border="1">
         <tr>
             <th>ID</th>
