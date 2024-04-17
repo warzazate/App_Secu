@@ -33,11 +33,5 @@
         }
         ?>
     </table>
-    <h2>Upload Student Certificate</h2>
-    <form action="upload_certificate.php" method="post" enctype="multipart/form-data">
-        Select certificate to upload (PDF only):
-        <input type="file" name="fileToUpload" id="fileToUpload" accept=".pdf">
-        <input type="submit" value="Importer le Certificat" name="submit">
-    </form>
 </body>
 </html>

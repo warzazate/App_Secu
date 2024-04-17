@@ -1,8 +1,10 @@
 <?php
 
-include 'db.php'; // Assurez-vous que ce fichier inclut la connexion à votre base de données.
 
-$target_dir = "uploads/";
+include 'db.php'; // Assurez-vous que ce fichier inclut la connexion à votre base de données.
+var_dump($_FILES);
+
+$target_dir = __DIR__ . "uploads/";
 $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
 $uploadOk = 1;
 $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -38,3 +40,28 @@ if ($uploadOk == 0) {
     }
 }
 ?>
+
+<h2>Upload Student Certificate</h2>
+    <form action="upload_certificate.php" method="POST" enctype="multipart/form-data">
+        Select certificate to upload (PDF only):
+        <input type="file" name="fileToUpload" id="fileToUpload" accept=".pdf">
+        <input type="submit" value="Importer le Certificat" name="submit">
+    </form>
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importer un certificat de scolarité</title>
+    </head>
+<body>
+    <!-- Formulaire pour télécharger les certificats -->
+    <h2>Upload Student Certificate</h2>
+    <form action="upload_certificate.php" method="post" enctype="multipart/form-data">
+        Select certificate to upload (PDF only):
+        <input type="file" name="fileToUpload" id="fileToUpload" accept=".pdf">
+        <input type="submit" value="Upload Certificate" name="submit">
+    </form>
+</body>
+</html>
