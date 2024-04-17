@@ -1,64 +1,61 @@
 <?php
-include 'db.php';  // Assure-toi que ce fichier contient la connexion à ta base de données
+session_start();
+// Secure session cookie
+session_regenerate_id(true);
+header("X-Frame-Options: DENY");
+header('X-Content-Type-Options: nosniff');
+header('X-XSS-Protection: 1; mode=block');
 
+include 'db.php';  // Assure-toi que ce fichier contient la connexion à ta base de données
 $message = "";  // Message pour afficher les erreurs ou confirmations
 
 
-// Récupérer la liste des tables
-try {
-    $stmt = $con->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME='students' OR TABLE_NAME='admin' OR TABLE_NAME='teachers'");
-    $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
-} catch (PDOException $e) {
-    die("Erreur lors de la récupération des tables : " . $e->getMessage());
-}
+$hash = password_hash("fautlecrypter", PASSWORD_BCRYPT, ["cost" => 12]);
 
-
-
+// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['username']) && isset($_POST['password'])) {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-        $stmt = $con->prepare("SELECT id, password_hash FROM users WHERE username = ?");
-        $stmt->execute([$username]);
-        $user = $stmt->fetch();
+    // Basic validation
+    if (empty($email) || empty($password)) {
+        echo "Both fields are required.";
+    } else {
+        $sql = "SELECT id, password, role FROM users WHERE email = :email";
+        $stmt = $con->prepare($sql);
+        
+        $stmt->execute(['email' => $email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password_hash'])) {
-            session_start();
+        
+
+        if ($user && password_verify($password, $user['password'])) {
+            // Password is correct, start a session
             $_SESSION['user_id'] = $user['id'];
-            header("Location: index.php");  // Rediriger vers la page d'accueil ou le tableau de bord
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['logged_in'] = time(); // record login time for session timeout
+
+            // Redirect to a new page or dashboard
+            header("Location: dashboard.php");
             exit;
         } else {
-            $message = "Invalid username or password.";
+            echo "Invalid email or password.";
         }
-    } else {
-        $message = "Username and password are required.";
     }
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
 </head>
 <body>
-    <h1>Login</h1>
-    <!-- Formulaire de login -->
-    <form action="authenticate.php" method="post">
-        Username: <input type="text" name="username" required><br>
-        Password: <input type="password" name="password" required><br>
-
-        <!-- Menu déroulant des tables -->
-        <label for="tables">Choose a table:</label>
-        <select name="tables" id="tables">
-            <?php foreach ($tables as $table): ?>
-                <option value="<?= htmlspecialchars($table) ?>"><?= htmlspecialchars($table) ?></option>
-            <?php endforeach; ?>
-        </select>
-
-        <input type="submit" value="Login">
+    <form method="post" action="login.php">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <button type="submit">Login</button>
     </form>
 </body>
 </html>

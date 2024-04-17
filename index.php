@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>List of Students</h1>
-    <a href="create.php">Add New Student</a>
+    <a href="createSTUDENT.php">Add New Student</a>
     <a href="login.php">Login Here</a>
     <table border="1">
         <tr>
@@ -29,7 +29,7 @@
             echo "<td>" . htmlspecialchars($row['last_name']) . "</td>";
             echo "<td>" . htmlspecialchars($row['email']) . "</td>";
             echo "<td>" . htmlspecialchars($row['age']) . "</td>";
-            echo "<td><a href='edit.php?id=" . $row['id'] . "'>Edit</a> <a href='delete.php?id=" . $row['id'] . "'>Delete</a></td>";
+            echo "<td><a href='editSTUDENT.php?id=" . $row['id'] . "'>Edit</a> <a href='deleteSTUDENT.php?id=" . $row['id'] . "'>Delete</a></td>";
             echo "</tr>";
         }
         ?>
