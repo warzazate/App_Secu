@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Secure session cookie
+// Regenerate session ID
 session_regenerate_id(true);
 header("X-Frame-Options: DENY");
 header('X-Content-Type-Options: nosniff');
@@ -9,9 +9,6 @@ header('X-XSS-Protection: 1; mode=block');
 include 'db.php';  // Assure-toi que ce fichier contient la connexion à ta base de données
 $message = "";  // Message pour afficher les erreurs ou confirmations
 
-
-$hash = password_hash("fautlecrypter", PASSWORD_BCRYPT, ["cost" => 12]);
-
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'] ?? '';
@@ -19,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Basic validation
     if (empty($email) || empty($password)) {
-        echo "Both fields are required.";
+        $errorMsg = "Both fields are required.";
     } else {
         $sql = "SELECT id, password, role FROM users WHERE email = :email";
         $stmt = $con->prepare($sql);
@@ -30,32 +27,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
 
         if ($user && password_verify($password, $user['password'])) {
-            // Password is correct, start a session
+            // Start the session and set cookie parameters securely
+            session_start([
+                'cookie_lifetime' => 604800, // 1 week
+                'cookie_secure' => true, // Set to true if using HTTPS
+                'cookie_httponly' => true // True means JavaScript can't access the cookie
+            ]);
+                            
+            // Set session variables
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
-            $_SESSION['logged_in'] = time(); // record login time for session timeout
-
-            // Redirect to a new page or dashboard
+            $_SESSION['logged_in'] = true;
+        
+            // Redirect to the dashboard
             header("Location: dashboard.php");
             exit;
         } else {
-            echo "Invalid email or password.";
+            $errorMsg = "Invalid email or password.";
         }
     }
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <form method="post" action="login.php">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-        <button type="submit">Login</button>
-    </form>
-</body>
-</html>

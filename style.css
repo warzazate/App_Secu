@@ -1,0 +1,102 @@
+.error-message {
+    color: #ff0000; /* Red color for error message */
+    background-color: #ffebeb; /* Light red background */
+    border: 1px solid #ff0000; /* Red border */
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 600px; /* Adjust as per your layout */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.success-message {
+    color: #155724; /* Dark green text color for success message */
+    background-color: #d4edda; /* Light green background */
+    border: 1px solid #c3e6cb; /* Green border */
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 600px; /* Adjust as per your layout */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* pour la page index */
+/* style.css */
+
+.body-index {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.login-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+.register-link {
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #003d82;
+}
+
+.logout_button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 20px;
+    background-color: #f44336; /* Red color for the logout link */
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1em;
+}
+
+.logout_button:hover {
+    background-color: #c0392b; /* Darker shade of red for the hover state */
+}
