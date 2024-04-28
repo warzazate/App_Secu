@@ -2,8 +2,8 @@
 session_start();
 
 // Check if the teacher is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['role'] !== 'teacher') {
-    // Not logged in or not a teacher, redirect to login page
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['role'] != 'teacher' && $_SESSION['role'] != 'admin') {
+    // Not logged in or not a teacher or admin, redirect to login page
     header("Location: index.php");
     exit;
 }
@@ -13,6 +13,23 @@ include 'db.php'; // Include your database connection
 // Assume teacher's ID is stored in session
 $teacher_id = $_SESSION['user_id'];
 
+
+//TO REDIRECT to other dashboard if user have more privileges
+$role = $_SESSION['role'] ?? 'none'; // Default to 'none' if not set
+// Output the button based on the role
+switch ($role) {
+    case 'staff':
+        echo '<button onclick="window.location.href=\'staffDashboard.php\';" class="redirect">Go to Staff Dashboard</button>';
+        break;
+    case 'superstaff':
+        echo '<button onclick="window.location.href=\'superstaffDashboard.php\';" class="redirect">Go to Superstaff Dashboard</button>';
+        break;
+    case 'admin':
+        echo '<button onclick="window.location.href=\'adminDashboard.php\';" class="redirect">Go to Admin Dashboard</button>';
+        break;
+    default:
+        break;
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -61,6 +78,6 @@ $teacher_id = $_SESSION['user_id'];
     </div>
     <?php endif; ?>
     
-    <a href="logout.php" class="logout_button container">Déconnexion</a>
+    <a href="login.php?action=logout" class="logout_button">Déconnexion</a>
 </body>
 </html>

@@ -100,3 +100,7 @@ button:hover {
 .logout_button:hover {
     background-color: #c0392b; /* Darker shade of red for the hover state */
 }
+
+.redirect  {
+    background-color: purple !important; 
+}

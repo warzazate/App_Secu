@@ -12,6 +12,7 @@ include 'login.php';?>
 <body class="body-index">
     <div class="container">
         <h1>Welcome to the Student Management System</h1>
+        <!-- pour voir message error ou success -->
         <?php if (!empty($errorMsg)): ?>
         <div class="error-message">
             <?php echo htmlspecialchars($errorMsg); ?>
@@ -22,8 +23,9 @@ include 'login.php';?>
             <?php echo htmlspecialchars($successMsg); ?>
         </div>
         <?php endif; ?>
+        <!-- début form -->
         <div class="login-form">
-            <form method="post" action="login.php">
+            <form method="post" action="index.php">
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" required>

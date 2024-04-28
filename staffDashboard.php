@@ -1,58 +1,52 @@
-<?php include 'db.php'; 
-include 'login.php';
-    // Check if the user is logged in
-    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-        // User is not logged in, redirect them to the login page
-        header("Location: index.php");
-        exit;
-    }
-?>
+<?php
+session_start();
 
+// Vérifier si l'utilisateur est connecté et s'il est un membre du personnel
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['role'] != 'staff' && $_SESSION['role'] != 'admin' && $_SESSION['role'] != 'superstaff') {
+    // Si l'utilisateur n'est pas staff, admin ou superstaff, rediriger vers la page de login
+    header("Location: login.php");
+    exit;
+}
+
+// Inclusion du fichier de connexion à la base de données
+include 'db.php';
+
+
+//TO REDIRECT to other dashboard if user have more privileges
+$role = $_SESSION['role'] ?? 'none'; // Default to 'none' if not set
+// Output the button based on the role
+switch ($role) {
+    case 'superstaff':
+        echo '<button onclick="window.location.href=\'superstaffDashboard.php\';" class="redirect">Go to Superstaff Dashboard</button>';
+        break;
+    case 'admin':
+        echo '<button onclick="window.location.href=\'adminDashboard.php\';" class="redirect">Go to Admin Dashboard</button>';
+        break;
+    default:
+        break;
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord du Staff</title>
     <link rel="stylesheet" href="style.css">
-    <title>Student Management System</title>
 </head>
 <body>
-    <h1>List of Students</h1>
-    <a href="createSTUDENT.php">Add New Student</a>
-    <a href="login.php">Login Here</a>
-    <!-- Register Here Button -->
-    <a href="register.php" style="margin-left: 10px;">Register Here</a>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Age</th>
-            <th>Actions</th>
-        </tr>
-        <?php
-        // il fallait mettre $con et pas $pdo pour lancer une requête à la base de données !!!!!
-        $stmt = $con->query('SELECT * FROM students');
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['first_name']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['last_name']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['age']) . "</td>";
-            echo "<td><a href='editSTUDENT.php?id=" . $row['id'] . "'>Edit</a> <a href='deleteSTUDENT.php?id=" . $row['id'] . "'>Delete</a></td>";
-            echo "</tr>";
-        }
-        ?>
-    </table>
-    <?php if (!empty($errorMsg)): ?>
-    <div class="error-message">
-        <?php echo htmlspecialchars($errorMsg); ?>
+    <h1>Tableau de Bord du Staff</h1>
+    <div>
+        <h2>Gestion du personnel</h2>
+        <button onclick="window.location.href='manageStudents.php';">Gérer les Étudiants</button>
+        <button onclick="window.location.href='manageTeachers.php';">Gérer les professeurs</button>
     </div>
-    <?php endif; ?>
-
-
-    <a href="logout.php" class="logout_button">Déconnexion</a>
+    <div>
+        <h2>Communication et Logistique</h2>
+        <button onclick="window.location.href='manageClasses.php';">Gérer les Classes</button>
+    </div>
+    <div>
+        <button onclick="window.location.href='login.php?action=logout';" class="logout_button">Déconnexion</button>
+    </div>
 </body>
 </html>

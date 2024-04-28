@@ -9,6 +9,6 @@ try {
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $successMsg = "Connexion réussie à la base de données SQL Server";
 } catch (PDOException $e) {
-    $errorMsg = "Erreur de connexion : " . $e->getMessage();
+    $errorMsg = "Erreur de connexion à la base de données";
 }
 ?>
