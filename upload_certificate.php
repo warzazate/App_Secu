@@ -1,20 +1,15 @@
 <?php
-session_start();
+session_start(); //Démarre une nouvelle session ou reprend une session existante (ici reprend la session existante)
 
-// Check if the user is logged in and has the appropriate role
+// Vérifie si l'utilisateur est connecté et a un rôle adéquat. Si l'utilisateur n'est pas connecté ou n'a pas le bon rôle, il est redirigé vers la page de connexion
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || ($_SESSION['role'] != 'staff' && $_SESSION['role'] != 'admin' && $_SESSION['role'] != 'superstaff')) {
     header("Location: index.php");
     exit;
 }
 
-// Include database configuration
-include 'db.php';
-
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['fileToUpload'])) {
-    $file = $_FILES['fileToUpload'];
+    $file = $_FILES['fileToUpload']; //récupération des données issus du fichier uploadé
     $errorMsg = ''; // Initialiser $errorMsg
-
     
     // Définir le chemin de destination
     $uploadDir = "uploads/";
@@ -63,23 +58,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['fileToUpload'])) {
 </head>
 <body>
     <h1>Upload PDF File</h1>
+    <!-- formulaire d'envoi de fichier -->
     <form action="upload_certificate.php" method="post" enctype="multipart/form-data">
         Select PDF file to upload:
         <input type="file" name="fileToUpload" id="fileToUpload">
         <input type="submit" value="Upload File" name="submit">
     </form><br>
     
+    <!-- affiche un message de validation si tout s'est bien déroulé -->
     <?php if (!empty($successMsg)): ?>
         <div class="success-message">
             <?php echo htmlspecialchars($successMsg); ?>
         </div>
     <?php endif; ?>
+    <!-- affiche un message d'erreur -->
     <?php if (!empty($errorMsg)): ?>
         <div class="error-message">
             <?php echo htmlspecialchars($errorMsg); ?>
         </div>
     <?php endif; ?>
 
+    <!-- bouton de redirection vers le dashboard du staff -->
     <button onclick="window.location.href='staffDashboard.php';">Retour sur l'écran général du Staff </button>
 </body>
 </html>

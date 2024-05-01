@@ -1,5 +1,6 @@
-<?php include 'db.php'; 
-include 'login.php';?>
+<?php require 'db.php'; //présent dans tous les fichiers, permet de d'inclure le fichier de connexion à la BDD 
+require 'login.php'; //présent dans tous les fichiers, permet de d'inclure le fichier de connexion des utilisateurs à l'application WEB 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +13,7 @@ include 'login.php';?>
 <body class="body-index">
     <div class="container">
         <h1>Welcome to the Student Management System</h1>
-        <!-- pour voir message error ou success -->
+        <!-- Pour voir message d'erreur ou de bonne réalisation -->
         <?php if (!empty($errorMsg)): ?>
         <div class="error-message">
             <?php echo htmlspecialchars($errorMsg); ?>
@@ -23,7 +24,7 @@ include 'login.php';?>
             <?php echo htmlspecialchars($successMsg); ?>
         </div>
         <?php endif; ?>
-        <!-- début form -->
+        <!-- Formulaire de connexion des utilisateurs -->
         <div class="login-form">
             <form method="post" action="index.php">
                 <div class="form-group">

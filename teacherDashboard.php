@@ -1,22 +1,20 @@
 <?php
-session_start();
+session_start();//Démarre une nouvelle session ou reprend une session existante (ici reprend la session existante)
 
-// Check if the teacher is logged in
+// Vérifie si l'utilisateur est connecté et a un rôle adéquat. Si l'utilisateur n'est pas connecté ou n'a pas le bon rôle, il est redirigé vers la page de connexion
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['role'] != 'teacher' && $_SESSION['role'] != 'admin') {
-    // Not logged in or not a teacher or admin, redirect to login page
     header("Location: index.php");
     exit;
 }
 
-include 'db.php'; // Include your database connection
+require 'db.php'; // Connexion à la base de données
 
-// Assume teacher's ID is stored in session
+// ID du teacher présent dans la session
 $teacher_id = $_SESSION['user_id'];
 
-
-//TO REDIRECT to other dashboard if user have more privileges
-$role = $_SESSION['role'] ?? 'none'; // Default to 'none' if not set
-// Output the button based on the role
+//Redirige vers un autre tableau de bord si l'utilisateur a plus de privilèges
+$role = $_SESSION['role'] ?? 'none'; // Par defaut est 'none' si l'utilisateur n'a pas de rôle
+//Montrer le bouton spécifique suivant le rôle
 switch ($role) {
     case 'staff':
         echo '<button onclick="window.location.href=\'staffDashboard.php\';" class="redirect">Go to Staff Dashboard</button>';
@@ -37,7 +35,7 @@ switch ($role) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord du Professeur</title>
-    <link rel="stylesheet" href="css\style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Liste des Étudiants</h1>
@@ -54,7 +52,8 @@ switch ($role) {
             <th>Actions</th>
         </tr>
         <?php
-        // Fetch students from database
+        // Récupère l'ensemble des étudiants (students) pour lesquels ils ont comme prof (teacher) celui connecté actuellement
+        //Prépare et exécute la requête SQL
         $stmt = $con->prepare("SELECT * FROM students WHERE teacher_id = ?");
         $stmt->execute([$teacher_id]);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -72,12 +71,14 @@ switch ($role) {
         }
         ?>
     </table>
+    <!-- affiche un message d'erreur -->
     <?php if (!empty($errorMsg)): ?>
     <div class="error-message">
         <?php echo htmlspecialchars($errorMsg); ?>
     </div>
     <?php endif; ?>
     
+    <!-- bouton de déconnexion -->
     <a href="login.php?action=logout" class="logout_button">Déconnexion</a>
 </body>
 </html>

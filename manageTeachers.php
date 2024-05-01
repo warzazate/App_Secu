@@ -1,32 +1,34 @@
 <?php
-session_start();
+session_start();//Démarre une nouvelle session ou reprend une session existante (ici reprend la session existante)
 
-// Check if the user is logged in and has the appropriate role
+// Vérifie si l'utilisateur est connecté et a un rôle adéquat. Si l'utilisateur n'est pas connecté ou n'a pas le bon rôle, il est redirigé vers la page de connexion
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || ($_SESSION['role'] != 'staff' && $_SESSION['role'] != 'admin' && $_SESSION['role'] != 'superstaff')) {
     header("Location: index.php");
     exit;
 }
 
-// Include database configuration
-include 'db.php';
+require 'db.php'; // Connexion à la base de données
 
-$action = $_GET['action'] ?? 'list'; // Default action to list if none specified
-$user_id = $_GET['user_id'] ?? 0; // For edit and delete actions using user_id
+$action = $_GET['action'] ?? 'list'; // "action" de l'utilisateur mise à "list" si aucune n'est spécifiée
+$user_id = $_GET['user_id'] ?? 0; // // Récupère l'identifiant des enseignants (teachers) cible pour les actions "edit" ou "delete"
 
-// Handle POST request for edit
+// Traitement des requêtes POST pour modifier
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && ($action == 'edit')) {
+    // Extraction et validation des données du formulaire
+    // Préparation et exécution des requêtes SQL pour modifier
     $firstName = $_POST['first_name'] ?? '';
     $lastName = $_POST['last_name'] ?? '';
     $department = $_POST['department'] ?? '';
     $hireDate = $_POST['hire_date'] ?? '';
 
+    //Prépare et exécute une requête SQL
     $stmt = $con->prepare("UPDATE teachers SET first_name = ?, last_name = ?, department = ?, hire_date = ? WHERE user_id = ?");
     $stmt->execute([$firstName, $lastName, $department, $hireDate, $user_id]);
     $successMsg = "Teacher updated successfully.";
-    $action = 'list';
+    $action = 'list';  //remet l'action par défaut : "list"
 }
 
-//TO CREATE !!! (need to create a user and a teacher !!!)
+//Pour créer un utilisateur dans la BDD + un teacher (lien des deux tables)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && ($action == 'create')) {
     // Collecter les données du formulaire
     $email = $_POST['email'] ?? '';
@@ -37,32 +39,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && ($action == 'create')) {
     $hireDate = $_POST['hire_date'] ?? '';
 
     try {
-        $con->beginTransaction();
-
+        $con->beginTransaction(); //utilisation de "transaction" pour effectuer plusieurs requêtes dans la BDD avec un seul formulaire
         // Insertion dans la table users
         $stmt = $con->prepare("INSERT INTO users (email, password, role) VALUES (?, ?, 'teacher')");
         $passwordHash = password_hash($password, PASSWORD_BCRYPT, ["cost" => 12]);
         $stmt->execute([$email, $passwordHash]);
 
-        $user_id = $con->lastInsertId();
+        $user_id = $con->lastInsertId(); //récupère l'id du dernier utilisateur créé
 
         // Insertion dans la table teachers
         $stmt = $con->prepare("INSERT INTO teachers (user_id, first_name, last_name, department, hire_date) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$user_id, $firstName, $lastName, $department, $hireDate]);
 
-        $con->commit();
+        $con->commit(); //lancement de la transaction pour que tout s'effectue en même temps (valide la transaction)
         $successMsg = "Teacher and user profile created successfully.";
     } catch (Exception $e) {
-        $con->rollBack();
+        $con->rollBack(); //si une étape dans la transaction n'a pas fonctionné, cela annule la transaction et affiche l'erreur
         $errorMsg = "Failed to create teacher profile: ";
     }
-    $action = 'list';
+    $action = 'list'; //remet l'action par défaut : "list"
 }
 
 
-// Handle GET request for delete
-if ($action == 'delete' && isset($_GET['user_id'])) {
+// Code pour supprimer un professeur (teacher)
+if ($action == 'delete' && isset($_GET['user_id'])) { 
     $user_id = $_GET['user_id'];
+    //Prépare et exécute une requête SQL
     $stmt = $con->prepare("DELETE FROM teachers WHERE user_id = ?");
     $stmt->execute([$user_id]);
 
@@ -86,10 +88,11 @@ if ($action == 'delete' && isset($_GET['user_id'])) {
         $con->rollBack();
         $errorMsg = "Failed to delete teacher profile";
     }
-    $action = 'list';
+    $action = 'list'; //remet l'action par défaut : "list"
 }
 
-// Fetch all teachers for listing
+// Récupère la liste de tous les enseignant (teachers) pour les lister
+//Prépare et exécute une requête SQL pour récupérer la liste de tous les enseignant (teachers) pour les lister
 $stmt = $con->prepare("SELECT * FROM teachers");
 $stmt->execute();
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -101,11 +104,11 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Teachers</title>
-    <link rel="stylesheet" href="css\style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Manage Teachers</h1>
-
+    <!-- Code pour afficher la liste des professeurs et les formulaires de création ou de modification -->
     <?php if ($action == 'list'): ?>
         <button onclick="window.location.href='?action=create';">Add New Teacher</button>
         <table border="1">
@@ -137,7 +140,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </table>
     <?php endif; ?>
     
-    <!-- TO CREATE Teacher !! -->
+    <!-- Pour lancer le script de création d'un teacher -->
     <?php if ($action == 'create'):
         ?>
         <form method="post">
@@ -158,7 +161,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
 
 
-    <!-- TO EDIT teacher !!!! -->
+    <!-- Pour lancer le script de modification d'un teacher -->
     <?php if ($action == 'edit'): 
         // Vérification de l'ID du teacher et récupération des données
         if (isset($_GET['user_id']) && $action == 'edit') {
@@ -186,17 +189,20 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </form>
     <?php endif; ?>
 
+    <!-- affiche un message de validation si tout s'est bien déroulé -->
     <?php if (!empty($successMsg)): ?>
         <div class="success-message">
             <?php echo htmlspecialchars($successMsg); ?>
         </div>
     <?php endif; ?>
+    <!-- affiche un message d'erreur s'il y en a eu un précedemment -->
     <?php if (!empty($errorMsg)): ?>
         <div class="error-message">
             <?php echo htmlspecialchars($errorMsg); ?>
         </div>
     <?php endif; ?>
 
+    <!-- bouton de redirection vers le dashboard du staff -->
     <button onclick="window.location.href='staffDashboard.php';">Retour sur l'écran général du Staff </button>
 </body>
 </html>

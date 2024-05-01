@@ -1,20 +1,21 @@
 <?php
-session_start();
+session_start(); //Démarre une nouvelle session ou reprend une session existante (ici reprend la session existante)
 
-// Check if the user is logged in and has the appropriate role
+// Vérifie si l'utilisateur est connecté et a un rôle adéquat. Si l'utilisateur n'est pas connecté ou n'a pas le bon rôle, il est redirigé vers la page de connexion
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['role'] != 'staff' && $_SESSION['role'] != 'admin' && $_SESSION['role'] != 'superstaff') {
     header("Location: index.php");
     exit;
 }
 
-// Include database configuration
-include 'db.php';
+require 'db.php'; // Connexion à la base de données
 
-$action = $_GET['action'] ?? 'list'; // Default action to list if none specified
-$id = $_GET['id'] ?? 0; // For edit and delete actions
+$action = $_GET['action'] ?? 'list'; // "action" de l'utilisateur mise à "list" si aucune n'est spécifiée
+$id = $_GET['id'] ?? 0; // Récupère l'identifiant de l'étudiant cible pour les actions "edit" ou "delete"
 
-// Handle POST request for create, edit
+// Traitement des requêtes POST pour créer ou modifier
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && ($action == 'create' || $action == 'edit')) {
+    // Extraction et validation des données du formulaire
+    // Préparation et exécution des requêtes SQL pour créer ou modifier
     $firstName = $_POST['first_name'] ?? '';
     $lastName = $_POST['last_name'] ?? '';
     $email = $_POST['email'] ?? '';
@@ -25,29 +26,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && ($action == 'create' || $action == '
     $teacherId = $_POST['teacher_id'] ?? '';
 
     if ($action == 'create') {
+        //Prépare et exécute une requête SQL pour créer un étudiant (student)
         $stmt = $con->prepare("INSERT INTO students (first_name, last_name, email, date_of_birth, gender, address, phone_number, teacher_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$firstName, $lastName, $email, $dateOfBirth, $gender, $address, $phoneNumber, $teacherId]);
         $successMsg = "Student created successfully.";
     } elseif ($id) {
+        //Prépare et exécute une requête SQL pour modifier un étudiant 
         $stmt = $con->prepare("UPDATE students SET first_name = ?, last_name = ?, email = ?, date_of_birth = ?, gender = ?, address = ?, phone_number = ?, teacher_id = ? WHERE id = ?");
         $stmt->execute([$firstName, $lastName, $email, $dateOfBirth, $gender, $address, $phoneNumber, $teacherId, $id]);
         $successMsg = "Student updated successfully.";
     }
-    $action = 'list';
+    $action = 'list'; //remet l'action par défaut : "list"
 }
 
-// Handle GET request for delete
+// Préparation et exécution d'une requête SQL pour supprimer un étudiant
 if ($action == 'delete' && isset($_GET['id'])) {
         $id = $_GET['id'];
+        //Prépare et exécute une requête SQL pour supprimer l'étudiant sélectionné
         $stmt = $con->prepare("DELETE FROM students WHERE id = ?");
         $stmt->execute([$id]);
         $successMsg = "Student deleted successfully.";
         $action = 'list';
     }
 
-
-
-// Fetch all students for listing
+// Prépare et exécute une requête SQL pour récupérer toute la liste des étudiants pour les lister
 $stmt = $con->prepare("SELECT * FROM students");
 $stmt->execute();
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -59,12 +61,14 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Students</title>
-    <link rel="stylesheet" href="css\style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- Interface utilisateur pour afficher les informations des étudiants et les formulaires pour créer ou modifier les entrées. -->
     <h1>Manage Students (for staff members)</h1>
 
     <?php if ($action == 'list'): ?>
+        <!--  Affiche des formulaires dynamiques pour la création des étudiants -->
         <button onclick="window.location.href='?action=create';">Add New Student</button>
         <table border="1">
             <thead>
@@ -103,6 +107,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </table>
     <?php endif; ?>
 
+    <!--  Affiche des formulaires dynamiques pour la modification des étudiants. Les champs sont pré-remplis -->
     <?php if ($action == 'create' || $action == 'edit'): 
         // Vérification de l'ID de l'étudiant et récupération des données
         if (isset($_GET['id']) && $action == 'edit') {
@@ -121,9 +126,8 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
             die('Invalid request!');
         }
     ?>
-        <!-- Form for creating or editing the student chosen -->
+        <!-- Formulaire pour modifier le student choisi -->
         <form method="post" action="?action=<?= htmlspecialchars($action) ?>&id=<?= htmlspecialchars($id) ?>">
-            <!-- Input fields for the form here... -->
             <label for="first_name">First Name:</label>
                 <input type="text" id="first_name" name="first_name" value="<?php if($action == 'edit'){echo htmlspecialchars($studentChoosed['first_name']);}?>" required><br>
             <label for="last_name">Last Name:</label>
@@ -148,13 +152,14 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </form>
     <?php endif; ?>
 
-
+    <!-- affiche un message de validation si tout s'est bien déroulé -->
     <?php if (!empty($successMsg)): ?>
         <div class="success-message">
             <?php echo htmlspecialchars($successMsg); ?>
         </div>
     <?php endif; ?>
 
+    <!-- bouton de redirection vers le dashboard du staff -->
     <button onclick="window.location.href='staffDashboard.php';">Retour sur l'écran général du Staff </button>
 </body>
 </html>

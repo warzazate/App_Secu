@@ -1,21 +1,16 @@
 <?php
-session_start();
+session_start(); //Démarre une nouvelle session ou reprend une session existante (ici démarre la session)
 // Regenerate session ID
-session_regenerate_id(true);
-header("X-Frame-Options: DENY");
-header('X-Content-Type-Options: nosniff');
-header('X-XSS-Protection: 1; mode=block');
+session_regenerate_id(true); //Régénère l'ID de la session pour protéger contre les attaques XSS
+//Header de sécurité
+header("X-Frame-Options: DENY"); //empêche l'incorporation de la page dans des iframes, protégeant contre les attaques de clickjacking.
+header('X-Content-Type-Options: nosniff'); // bloque les navigateurs de tenter de sniff le MIME type, ce qui peut prévenir certains types d'attaques.
+header('X-XSS-Protection: 1; mode=block'); //active les filtres de protection XSS des navigateurs et configure pour bloquer la page entière si une attaque est détectée.
 
-include 'db.php';  // Assure-toi que ce fichier contient la connexion à ta base de données
+require 'db.php';  // Connexion à la base de données
 
-// if (!isset($_SERVER['HTTP_REFERER'])) {
-//     // HTTP_REFERER n'est pas défini si la page est accédée directement
-//     header("Location: index.php");
-//     exit;
-// }
-
-// Vérification de la demande de logout
-if (isset($_GET['action']) && $_GET['action'] == 'logout') {
+// Gestion de la déconnexion : 
+if (isset($_GET['action']) && $_GET['action'] == 'logout') { //vérifie si l'utilisateur a demandé à se déconnection (action = logout)
     // Détruire toutes les variables de session
     $_SESSION = array();
     
@@ -27,7 +22,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
             $params["secure"], $params["httponly"]
         );
     }
-    
     // Détruire la session
     session_destroy();
     
@@ -37,54 +31,53 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
 }
 
 
-
-// Check if the LOGIN form is submitted
+// Traitement de la connexion des utilisateurs
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // Basic validation
+    // Validation basique
     if (empty($email) || empty($password)) {
-        $errorMsg = "Both fields are required.";
-    } else {
-        $sql = "SELECT id, password, role FROM users WHERE email = :email";
+        $errorMsg = "Both fields are required."; // Vérifie que les champs email et mot de passe ne sont pas vides
+    } else { 
+        $sql = "SELECT id, password, role FROM users WHERE email = :email"; //Prépare et exécute une requête SQL pour rechercher l'utilisateur par email.
         $stmt = $con->prepare($sql);
         
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         
-
+        //Si utilisateur trouvé, il compare le mot de passe saisi avec le hash enregistré dans la base de données.
         if ($user && password_verify($password, $user['password'])) {
-            // Start the session and set cookie parameters securely
+            // Redémarre la session avec des paramètres de cookie sécurisés
             session_start([
-                'cookie_lifetime' => 604800, // 1 week
-                'cookie_secure' => true, // Set to true if using HTTPS
-                'cookie_httponly' => true // True means JavaScript can't access the cookie
+                'cookie_lifetime' => 604800, // Vie du cookie : 1 semaine
+                'cookie_secure' => true, // Met en "true" si l'utilisateur utilise HTTPS
+                'cookie_httponly' => true // True signifie que JavaScript ne peut pas accéder au cookie
             ]);
                             
-            // Set session variables
+            // Enregistre les informations de l'utilisateur dans les variables de session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['logged_in'] = true;
  
-            //Redirect to the role's page
+            //Redirige l'utilisateur vers une page spécifique basée sur son rôle. Si aucun rôle n'est reconnu, redirige vers la page de login.
             switch ($_SESSION['role']) {
                 case 'teacher':
-                    // Redirection vers le tableau de bord des enseignants
+                    // Redirection vers le tableau de bord des enseignants (teachers)
                     header("Location: teacherDashboard.php");
                     exit;
                 case 'staff':
-                    // Redirection vers le tableau de bord du personnel
+                    // Redirection vers le tableau de bord du personnel (staff)
                     header("Location: staffDashboard.php");
                     exit;
                 case 'superstaff':
-                    // Redirection vers le tableau de bord du super personnel
+                    // Redirection vers le tableau de bord du super personnel (superstaff)
                     header("Location: superStaffDashboard.php");
                     exit;
                 case 'admin':
-                    // Redirection vers le tableau de bord de l'administrateur
+                    // Redirection vers le tableau de bord de l'administrateur (admin)
                     header("Location: adminDashboard.php");
                     exit;
                 default:

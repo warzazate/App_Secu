@@ -1,20 +1,16 @@
 <?php
-session_start();
+session_start();//Démarre une nouvelle session ou reprend une session existante (ici reprend la session existante)
 
-// Vérifier si l'utilisateur est connecté et s'il est un membre du personnel
+// Vérifie si l'utilisateur est connecté et a un rôle adéquat. Si l'utilisateur n'est pas connecté ou n'a pas le bon rôle, il est redirigé vers la page de connexion
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['role'] != 'staff' && $_SESSION['role'] != 'admin' && $_SESSION['role'] != 'superstaff') {
     // Si l'utilisateur n'est pas staff, admin ou superstaff, rediriger vers la page de login
     header("Location: login.php");
     exit;
 }
 
-// Inclusion du fichier de connexion à la base de données
-include 'db.php';
-
-
-//TO REDIRECT to other dashboard if user have more privileges
-$role = $_SESSION['role'] ?? 'none'; // Default to 'none' if not set
-// Output the button based on the role
+//Redirige vers un autre tableau de bord si l'utilisateur a plus de privilèges
+$role = $_SESSION['role'] ?? 'none'; // Par defaut est 'none' si l'utilisateur n'a pas de rôle
+//Montrer le bouton spécifique suivant son rôle
 switch ($role) {
     case 'superstaff':
         echo '<button onclick="window.location.href=\'superstaffDashboard.php\';" class="redirect">Go to Superstaff Dashboard</button>';
@@ -32,7 +28,7 @@ switch ($role) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord du Staff</title>
-    <link rel="stylesheet" href="css\style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Tableau de Bord du Staff</h1>
@@ -47,6 +43,7 @@ switch ($role) {
     Ce bouton ne fonctionne pas encore-->
         <button onclick="window.location.href='upload_certificate.php';">Ajouter certificat de scolarité</button>
     </div>
+    <!-- bouton de déconnexion -->
     <div>
         <button onclick="window.location.href='login.php?action=logout';" class="logout_button">Déconnexion</button>
     </div>
