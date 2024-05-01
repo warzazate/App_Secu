@@ -39,6 +39,7 @@ switch ($role) {
 </head>
 <body>
     <h1>Liste des Étudiants</h1>
+    <!-- Tableau pour affichier la liste des étudants -->
     <table border="1">
         <tr>
             <th>ID</th>

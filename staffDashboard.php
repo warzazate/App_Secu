@@ -34,6 +34,7 @@ switch ($role) {
     <h1>Tableau de Bord du Staff</h1>
     <div>
         <h2>Gestion du personnel</h2>
+        <!-- bouton pour rediriger vers les pages de gestion du personnel -->
         <button onclick="window.location.href='manageStudents.php';">Gérer les Étudiants</button>
         <button onclick="window.location.href='manageTeachers.php';">Gérer les professeurs</button>
     </div>

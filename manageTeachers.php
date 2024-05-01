@@ -176,6 +176,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
             die('Invalid request!');
         }
         ?>
+        <!-- formulaire de modification d'un teacher -->
         <form method="post" action="?action=<?= htmlspecialchars($action) ?>&user_id=<?= htmlspecialchars($user_id) ?>">
             <label for="first_name">First Name:</label>
             <input type="text" id="first_name" name="first_name" value="<?= $action == 'edit' ? htmlspecialchars($teacherChoosed['first_name']) : '' ?>" required><br>

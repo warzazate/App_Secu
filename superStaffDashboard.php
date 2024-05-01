@@ -47,11 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && ($action == 'create' || $action == '
             }
         }
     } elseif ($id) { //cas de la modification d'un staff
+        //Prépare et exécute une requête SQL
         $stmt = $con->prepare("UPDATE users SET email = ?, role = ? WHERE id = ?");
         $stmt->execute([$email, $role, $id]);
         $successMsg = "Staff member updated successfully.";
     }
-    $action = 'list';
+    $action = 'list';//remet l'action par défaut : "list"
 }
 
 // Code pour supprimer un membre du staff
@@ -90,7 +91,9 @@ if($role == 'admin') {
     <h1>Manage Staff (for Superstaff)</h1>
 
     <?php if ($action == 'list'): ?>
+        <!-- bouton pour ajouter un membre du staff -->
         <button onclick="window.location.href='?action=create';">Add New Staff Member</button>
+        <!-- Tableau pour affichier la liste des membres du staff -->
         <table border="1">
             <thead>
                 <tr>
@@ -135,6 +138,7 @@ if($role == 'admin') {
             die('Invalid request!');
         }
     ?>
+        <!-- formulaire pour créer/modif un membre du staff -->
         <form method="post" action="?action=<?= htmlspecialchars($action) ?>&id=<?= htmlspecialchars($id) ?>">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" value="<?= $action == 'edit' ? htmlspecialchars($staffMemberChoosed['email']) : '' ?>" required><br>
