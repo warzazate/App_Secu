@@ -7,8 +7,9 @@ $dbName = "student_management";
 try {
     $con = new PDO("mysql:host=$serverName;dbname=$dbName", $username, $password);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $successMsg = "Connexion réussie à la base de données SQL Server";
+    // $successMsg = "Connexion réussie à la base de données SQL Server";
 } catch (PDOException $e) {
-    $errorMsg = "Erreur de connexion à la base de données";
+    // $errorMsg = "Erreur de connexion à la base de données";
+    // Plutôt ajouter, si on a le temps, un message de log dans un fichier sécurisé !)
 }
 ?>

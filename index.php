@@ -37,9 +37,6 @@ include 'login.php';?>
                 <div class="form-group">
                     <button type="submit">Connexion</button>
                 </div>
-                <div class="register-link">
-                    Pas encore inscrit ? <a href="register.php">Inscrivez-vous ici</a>
-                </div>
             </form>
         </div>
     </div>

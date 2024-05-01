@@ -32,7 +32,7 @@ switch ($role) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord du Staff</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css\style.css">
 </head>
 <body>
     <h1>Tableau de Bord du Staff</h1>
@@ -43,7 +43,9 @@ switch ($role) {
     </div>
     <div>
         <h2>Communication et Logistique</h2>
-        <button onclick="window.location.href='manageClasses.php';">Gérer les Classes</button>
+        <!-- <button onclick="window.location.href='manageClasses.php';">Gérer les Classes</button> 
+    Ce bouton ne fonctionne pas encore-->
+        <button onclick="window.location.href='upload_certificate.php';">Ajouter certificat de scolarité</button>
     </div>
     <div>
         <button onclick="window.location.href='login.php?action=logout';" class="logout_button">Déconnexion</button>
