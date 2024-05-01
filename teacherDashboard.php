@@ -49,8 +49,7 @@ switch ($role) {
             <th>Date of birth</th>
             <th>Gender</th>
             <th>Address</th>
-            <th>Phone</th>
-            <th>Actions</th>
+            <th>Phone number</th>
         </tr>
         <?php
         // Récupère l'ensemble des étudiants (students) pour lesquels ils ont comme prof (teacher) celui connecté actuellement
@@ -67,7 +66,6 @@ switch ($role) {
             echo "<td>" . htmlspecialchars($row['gender']) . "</td>";
             echo "<td>" . htmlspecialchars($row['address']) . "</td>";
             echo "<td>" . htmlspecialchars($row['phone_number']) . "</td>";
-            echo "<td><a href='editSTUDENT.php?id=" . $row['id'] . "'>Edit</a> <a href='deleteSTUDENT.php?id=" . $row['id'] . "'>Delete</a></td>";
             echo "</tr>";
         }
         ?>
